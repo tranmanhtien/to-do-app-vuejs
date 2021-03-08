@@ -9,16 +9,8 @@
             @finishedEdit="finishedEdit"
         />
         <div class="extra-container">
-            <div>
-                <label>
-                    <input 
-                        type="checkbox" 
-                        :checked="!anyRemaing"
-                        @change="checkAllToDo"
-                    >check all
-                </label>
-            </div>
-            <div>{{ remaning}} items left</div>
+           <ToDoCheckAll :anyRemaing="anyRemaing"/>
+            <ToDoItemsRemaining :remaning="remaning"/>
             
         </div>
     </div>
@@ -26,6 +18,8 @@
 
 <script>
 import ToDoItem from "./ToDoItem";
+import ToDoItemsRemaining from "./ToDoItemsRemaining";
+import ToDoCheckAll from "./ToDoCheckAll";
     export default {
         data() {
             return {
@@ -54,12 +48,19 @@ import ToDoItem from "./ToDoItem";
                 ]
             }
         },
+        created() {
+            eventBus.$on('removeToDo', (index) => this.removeToDo(index));
+            eventBus.$on('finishedEdit', (data) => this.finishedEdit(data));
+             eventBus.$on('checkAllChanged', (checked) => this.checkAllToDo(checked));
+        },
         components: {
-            ToDoItem
+            ToDoItem,
+            ToDoItemsRemaining,
+            ToDoCheckAll
         },
         computed: {
             remaning() {
-                return this.toDos.filter(todo => !todo.completed).length ;
+                return this.$store.state.toDos.filter(todo => !todo.completed).length ;
             },
             anyRemaing(){
                 return this.remaning != 0;   
@@ -70,7 +71,7 @@ import ToDoItem from "./ToDoItem";
                 if(this.newToDo.trim().length == 0) {
                     return
                 }
-                this.toDos.push({
+                this.$store.state.toDos.push({
                     id: this.idForToDo,
                     tittle: this.newToDo,
                     completed: false
@@ -79,15 +80,15 @@ import ToDoItem from "./ToDoItem";
                 this.idForToDo++;
             },
             checkAllToDo: function(){
-                this.toDos.forEach((todo) => {
+                this.$store.state.toDos.forEach((todo) => {
                     todo.completed = event.target.checked;
                 })
             },
             finishedEdit: function(data) {
-                this.toDos.splice(data.index,1,data.todo)
+                this.$store.state.toDos.splice(data.index,1,data.todo)
             },
             removeToDo: function(index) {
-                this.toDos.splice(index,1);
+                this.$store.state.toDos.splice(index,1);
             }
         }
        

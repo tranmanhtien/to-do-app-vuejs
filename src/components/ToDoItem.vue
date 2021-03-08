@@ -58,7 +58,7 @@
         },
         methods: {
             removeToDo: function(index) {
-                this.$emit('removeToDo',index);
+                eventBus.$emit('removeToDo',index);
             },
             editToDo: function() {
                 this.beforeEditCache = this.tittle;
@@ -69,7 +69,7 @@
                     this.tittle = this.beforeEditCache;
                 }
                 this.editting = false;
-                this.$emit('finishedEdit',{
+                eventBus.$emit('finishedEdit',{
                     index: this.index,
                     todo: {
                         id : this.id,
